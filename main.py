@@ -1,13 +1,13 @@
 import re
 import csv
 
-# from pprint import pprint
 
 def savecsv(contacts_list, filename="phonebook.csv"):
     ''' save contacts_list: list in phonebook.csv '''
     with open(filename, "w", encoding='utf-8', newline='') as f:
         datawriter = csv.writer(f, delimiter=',')
         datawriter.writerows(contacts_list)
+
 
 def opencsv():
     ''' open phonebook_raw.csv '''
@@ -16,8 +16,9 @@ def opencsv():
         contacts_list = list(rows)
     return contacts_list
 
+
 def getfromline(line: str)-> list:
-    ''''''
+    ''' преобразование строки в список регулярными выражениями по частям. '''
     fio_groups = re.compile(r'([А-Я][а-я]+)(?:\s|,{,2})([А-Я][а-я]+)(?:\s|,{,2})(?:([А-Я][а-я]+),|,)')
     org_pos = re.compile(r'[^,]*,[^,]*,[^,]*,([^,]*),([^,]*),[^,]*,[^,]*')
     tel = re.compile(r'((?:\+7|8))\s*\(?(\d\d\d)\)?(?:-|\s?)(\d\d\d)(?:-|\s?)(\d\d)(?:-|\s?)(\d\d)(?:\s*\(*(доб\.)\s*(\d{3,5})|)')
@@ -39,8 +40,9 @@ def getfromline(line: str)-> list:
     line_result.extend([[''], email_][bool(email_)])
     return line_result
 
-def test():
-    ''' '''
+
+def test_1():
+    ''' Считываем из файла строки и преобразовываем с помощью регулярок по частям '''
 
     with open("phonebook_raw.csv", encoding='utf-8') as f:
         title = f.readline().strip().split(',')
@@ -59,7 +61,9 @@ def test():
         contacts_list.append(value)
     savecsv(contacts_list, filename='phonebook2.csv')
 
-def getphonetest(s):
+
+def getphonegroups(s):
+    ''' преобразование строки с телефоном с помощью match(string).groups '''
     tel = re.compile(r'((?:\+7|8))\s*\(?(\d\d\d)\)?(?:-|\s?)(\d\d\d)(?:-|\s?)(\d\d)(?:-|\s?)(\d\d)(?:\s*\(*(доб\.)\s*(\d{3,5})|)\)?')
     g = tuple(_ for _ in tel.match(s).groups() if _)
     # +7(999)999-99-99 доб.9999
@@ -71,13 +75,17 @@ def getphonetest(s):
         res = len(g)
     return res
 
+
 def getphone(s):
+    ''' преобразование строки с телефоном с помозью метода sub '''
     tel = re.compile(r'((?:\+7|8))\s*\(?(\d\d\d)\)?(?:-|\s?)(\d\d\d)(?:-|\s?)(\d\d)(?:-|\s?)(\d\d)(?:\s*\(*(доб\.)\s*(\d{3,5})|)\)?')
     # +7(999)999-99-99 доб.9999
     res = tel.sub(r'+7(\2)\3-\3-\4 \6\7', s)
     return res
 
-def main():
+
+def test_0():
+    ''' Считываем csv как список списков и мучаем его в меру испорченности '''
     tlist = opencsv()
 
     phonebookadict = {}
@@ -102,6 +110,11 @@ def main():
 
     savecsv(contacts_list)
 
+
+def main():
+    test_0()
+    test_1()
+
+
 if __name__ == '__main__':
     main()
-    test()
